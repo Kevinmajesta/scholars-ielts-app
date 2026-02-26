@@ -102,10 +102,13 @@ or http://localhost:8000/api/documentation for swagger UI
 ## AI Question
 
 1. kira kira dari test diatas, table yg di pake apa aja yg hrus ku buat?
-2. UBAH CSRF DI LARAVEL KE JWT gmna chat?
-3. cara install swagger ui gmna
-4. tolong bikin anotsi buat swagger ui
-5. ini error apa
+2. Apakah CSRF ini bawaaan dari laravel breeze?
+3. UBAH CSRF DI LARAVEL KE JWT gmna chat?
+4. Konek jwt ke controller di laravel gmn chat
+5. cara install swagger ui gmna
+6. apakah swagger ui dgn postman untuk cek api sama? atau beda
+7. tolong bikin anotsi buat swagger ui
+8. ini error apa
 
 ```sh
 PS D:\Magang\scholars-ielts-app> php artisan l5-swagger:generate.
@@ -117,7 +120,8 @@ PS D:\Magang\scholars-ielts-app> php artisan l5-swagger:generate.
 
 PS D:\Magang\scholars-ielts-app> 
 ```
-6. Tolong Bikin readme project ini dari test yang kukirim diatas
+9. Tolong Bikin readme project ini dari test yang kukirim diatas
+10. cara masukin image di readme gmn chat
 
 
 ## Relasi Database
