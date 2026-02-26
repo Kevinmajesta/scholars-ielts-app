@@ -45,7 +45,8 @@ class IeltsController extends Controller
     public function show($id)
     {
         $essay = Essay::with('questions.options')->find($id);
-        if (!$essay) return response()->json(['message' => 'Essay not found'], 404);
+        if (!$essay)
+            return response()->json(['message' => 'Essay not found'], 404);
         return response()->json(['success' => true, 'data' => $essay]);
     }
 
@@ -59,13 +60,15 @@ class IeltsController extends Controller
             required: true,
             content: new OA\JsonContent(
                 properties: [
+                    
+                    new OA\Property(property: 'essay_id', type: 'integer', example: 1),
                     new OA\Property(
                         property: 'answers',
                         type: 'array',
                         items: new OA\Items(
                             properties: [
-                                new OA\Property(property: 'question_id', type: 'integer'),
-                                new OA\Property(property: 'option_id', type: 'integer'),
+                                new OA\Property(property: 'question_id', type: 'integer', example: 1),
+                                new OA\Property(property: 'option_id', type: 'integer', example: 2),
                             ],
                             type: 'object'
                         )
@@ -74,36 +77,43 @@ class IeltsController extends Controller
             )
         ),
         responses: [
-            new OA\Response(response: 200, description: 'Skor dihitung'),
+            new OA\Response(response: 200, description: 'Skor dihitung dan disimpan'),
+            new OA\Response(response: 400, description: 'Data tidak lengkap atau ID salah'),
         ]
     )]
     public function submit(Request $request)
     {
         $userAnswers = $request->input('answers', []);
-        if (empty($userAnswers)) return response()->json(['message' => 'Jawaban kosong'], 400);
+        if (empty($userAnswers))
+            return response()->json(['message' => 'Jawaban kosong'], 400);
 
+        $totalQuestions = count($userAnswers);
         $optionIds = collect($userAnswers)->pluck('option_id');
         $options = Option::whereIn('id', $optionIds)->get()->keyBy('id');
-        
+
         $correctCount = 0;
         $details = [];
 
         foreach ($userAnswers as $answer) {
             $option = $options->get($answer['option_id']);
             $isCorrect = $option && $option->is_correct && $option->question_id == $answer['question_id'];
-            if ($isCorrect) $correctCount++;
+            if ($isCorrect)
+                $correctCount++;
             $details[] = ['question_id' => $answer['question_id'], 'is_correct' => $isCorrect];
         }
 
-        return response()->json([
-            'success' => true,
-            'results' => [
-                'total_questions' => count($userAnswers),
-                'correct_answers' => $correctCount,
-                'score' => round(($correctCount / count($userAnswers)) * 100, 2),
-                'details' => $details
-            ]
+        $score = ($correctCount / $totalQuestions) * 100;
+
+        $result = \App\Models\ExamResult::create([
+            'user_id' => auth('api')->id(),
+            'essay_id' => $request->essay_id,
+            'total_questions' => $totalQuestions,
+            'correct_answers' => $correctCount,
+            'score' => round($score, 2),
+            'details' => $details
         ]);
+
+        return response()->json(['success' => true, 'results' => $result]);
     }
 
     #[OA\Post(
@@ -204,7 +214,9 @@ class IeltsController extends Controller
             $essay = Essay::create(['title' => $validated['title'], 'content' => $validated['content']]);
             foreach ($validated['questions'] as $qData) {
                 $question = $essay->questions()->create(['question_text' => $qData['question_text']]);
-                foreach ($qData['options'] as $oData) { $question->options()->create($oData); }
+                foreach ($qData['options'] as $oData) {
+                    $question->options()->create($oData);
+                }
             }
             return $essay;
         });
@@ -280,7 +292,7 @@ class IeltsController extends Controller
         ),
         responses: [
             new OA\Response(
-                response: 200, 
+                response: 200,
                 description: 'Essay berhasil diperbarui',
                 content: new OA\JsonContent(
                     properties: [
@@ -328,7 +340,8 @@ class IeltsController extends Controller
     public function update(Request $request, $id)
     {
         $essay = Essay::find($id);
-        if (!$essay) return response()->json(['message' => 'Essay not found'], 404);
+        if (!$essay)
+            return response()->json(['message' => 'Essay not found'], 404);
 
         $validated = $request->validate([
             'title' => 'required|string',
@@ -345,7 +358,9 @@ class IeltsController extends Controller
             $essay->questions()->delete();
             foreach ($validated['questions'] as $qData) {
                 $question = $essay->questions()->create(['question_text' => $qData['question_text']]);
-                foreach ($qData['options'] as $oData) { $question->options()->create($oData); }
+                foreach ($qData['options'] as $oData) {
+                    $question->options()->create($oData);
+                }
             }
         });
 
@@ -368,7 +383,8 @@ class IeltsController extends Controller
     public function destroy($id)
     {
         $question = Question::find($id);
-        if (!$question) return response()->json(['message' => 'Question not found'], 404);
+        if (!$question)
+            return response()->json(['message' => 'Question not found'], 404);
         $question->delete();
         return response()->json(['success' => true, 'message' => 'Deleted successfully']);
     }

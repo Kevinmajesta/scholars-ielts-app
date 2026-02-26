@@ -80,15 +80,21 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
+                                    "essay_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
                                     "answers": {
                                         "type": "array",
                                         "items": {
                                             "properties": {
                                                 "question_id": {
-                                                    "type": "integer"
+                                                    "type": "integer",
+                                                    "example": 1
                                                 },
                                                 "option_id": {
-                                                    "type": "integer"
+                                                    "type": "integer",
+                                                    "example": 2
                                                 }
                                             },
                                             "type": "object"
@@ -102,7 +108,10 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Skor dihitung"
+                        "description": "Skor dihitung dan disimpan"
+                    },
+                    "400": {
+                        "description": "Data tidak lengkap atau ID salah"
                     }
                 },
                 "security": [
@@ -540,7 +549,7 @@
                                 "properties": {
                                     "email": {
                                         "type": "string",
-                                        "example": "kevin@example.com"
+                                        "example": "admin@example.com"
                                     },
                                     "password": {
                                         "type": "string",

@@ -118,3 +118,7 @@ PS D:\Magang\scholars-ielts-app> php artisan l5-swagger:generate.
 PS D:\Magang\scholars-ielts-app> 
 ```
 6. Tolong Bikin readme project ini dari test yang kukirim diatas
+
+
+## Relasi Database
+![Relasi](assets/image.png)
