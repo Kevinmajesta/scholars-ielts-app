@@ -367,9 +367,9 @@ class IeltsController extends Controller
     )]
     public function destroy($id)
     {
-        $essay = Essay::find($id);
-        if (!$essay) return response()->json(['message' => 'Essay not found'], 404);
-        $essay->delete();
+        $question = Question::find($id);
+        if (!$question) return response()->json(['message' => 'Question not found'], 404);
+        $question->delete();
         return response()->json(['success' => true, 'message' => 'Deleted successfully']);
     }
 }

@@ -25,6 +25,6 @@ Route::middleware(['auth:api'])->group(function () {
     Route::middleware(['admin'])->prefix('admin/ielts')->group(function () {
         Route::post('/essays', [IeltsController::class, 'store']);        
         Route::put('/essays/{id}', [IeltsController::class, 'update']);   
-        Route::delete('/essays/{id}', [IeltsController::class, 'destroy']); 
+        Route::delete('/questions/{id}', [IeltsController::class, 'destroy']); 
     });
 });

@@ -1,59 +1,120 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Scholars IELTS Reading API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+---
 
-## About Laravel
+Proyek ini adalah sistem backend berbasis Laravel untuk aplikasi latihan soal IELTS Reading. Sistem ini mencakup manajemen konten (essay/passage), sistem penilaian otomatis, dan otentikasi menggunakan JWT (JSON Web Token).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Fitur
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+1. Manajemen Soal IELTS: CRUD lengkap untuk essay, pertanyaan, dan pilihan jawaban.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+2. Sistem Penilaian Otomatis: Menghitung skor berdasarkan jawaban user secara real-time.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+3. Otentikasi JWT: Registrasi dan login aman menggunakan tymon/jwt-auth.
 
-## Laravel Sponsors
+4. RBAC (Role-Based Access Control): Perbedaan hak akses antara user dan admin.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+5. Dokumentasi Swagger: Dokumentasi API interaktif yang dapat dicoba langsung melalui browser.
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Stack
 
-## Contributing
+Framework: Laravel 11
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Bahasa: PHP 8.x
 
-## Code of Conduct
+Database: MySQL
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Dokumentasi: L5-Swagger (OpenAPI 3.0)
 
-## Security Vulnerabilities
+Otentikasi: JWT Auth
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Installation 👨🏻
 
-## License
+1. Clone Repository
+   By use terminal/cmd
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```sh
+git clone https://github.com/Kevinmajesta/scholars-ielts-app.git
+```
+
+2. Instal dependensi:
+   By use terminal/cmd
+
+```sh
+composer install
+```
+
+2. Check the .env file and configure with your device
+
+3. Enable the MySql database
+
+4. Run the command to create the database and migrate it.
+
+5. Setup environment
+
+```sh
+docker-compose up -dcp .env.example .env
+php artisan key:generate
+php artisan jwt:secret
+```
+
+6. Migrasi & Seed:
+
+```sh
+php artisan migrate --seed
+```
+
+7. Run the application
+
+```sh
+php artisan serve
+```
+
+---
+
+## Development
+
+This project app develope by 1 people
+| Name | Github |
+| ------ | ------ |
+| Kevin | https://github.com/Kevinmajesta |
+
+By using github for development for staging and production.
+
+## API Documentation
+
+Proyek ini menggunakan Swagger untuk dokumentasi. Setelah server berjalan, akses melalui:
+http://localhost:8000/api/documentation atau postman
+
+```sh
+link web :
+https://www.postman.com/lunar-resonance-148572/workspace/kevin-work/collection/33423852-9eb10270-a2eb-4c4b-b6a8-9add52620480?action=share&source=copy-link&creator=33423852
+for the the api spec :)
+or http://localhost:8000/api/documentation for swagger UI
+```
+
+## AI Quaetions
+
+1. kira kira dari test diatas, table yg di pake apa aja yg hrus ku buat?
+2. UBAH CSRF DI LARAVEL KE JWT gmna chat?
+3. cara install swagger ui gmna
+4. tolong bikin anotsi buat swagger ui
+5. ini error apa
+
+```sh
+PS D:\Magang\scholars-ielts-app> php artisan l5-swagger:generate.
+
+   ERROR  Command "l5-swagger:generate. Did you mean one of these?  
+
+  ⇂ key:generate  
+  ⇂ l5-swagger:generate  
+
+PS D:\Magang\scholars-ielts-app> 
+```
+6. Tolong Bikin readme project ini dari test yang kukirim diatas
