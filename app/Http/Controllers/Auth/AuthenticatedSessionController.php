@@ -3,36 +3,76 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
+use OpenApi\Attributes as OA;
 
+#[OA\Post(
+    path: '/api/login',
+    operationId: 'login',
+    tags: ['Auth'],
+    summary: 'Login User untuk mendapatkan Token',
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'email', type: 'string', example: 'admin@example.com'),
+                new OA\Property(property: 'password', type: 'string', example: 'password'),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Berhasil Login',
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'access_token', type: 'string', example: 'eyJ0eXAiOiJKV1QiLCJhbGc...'),
+                    new OA\Property(property: 'token_type', type: 'string', example: 'bearer'),
+                    new OA\Property(
+                        property: 'user',
+                        type: 'object',
+                        properties: [
+                            new OA\Property(property: 'id', type: 'integer', example: 2),
+                            new OA\Property(property: 'name', type: 'string', example: 'Kevin'),
+                            new OA\Property(property: 'email', type: 'string', example: 'kevin@example.com'),
+                            new OA\Property(property: 'role', type: 'string', example: 'admin'),
+                        ]
+                    ),
+                ]
+            )
+        ),
+        new OA\Response(
+            response: 401,
+            description: 'Unauthorized',
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'message', type: 'string', example: 'Unauthorized'),
+                ]
+            )
+        ),
+    ]
+)]
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Handle an incoming authentication request.
-     */
-    public function store(LoginRequest $request): Response
+    public function store(Request $request): JsonResponse
     {
-        $request->authenticate();
+        $credentials = $request->only('email', 'password');
 
-        $request->session()->regenerate();
+        if (!$token = auth('api')->attempt($credentials)) {
+            return response()->json(['message' => 'Wrong Email or Password'], 401);
+        }
 
-        return response()->noContent();
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'user' => auth('api')->user()
+        ]);
     }
 
-    /**
-     * Destroy an authenticated session.
-     */
-    public function destroy(Request $request): Response
+    public function destroy(Request $request)
     {
-        Auth::guard('web')->logout();
-
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
-
-        return response()->noContent();
+        auth('api')->logout();
+        return response()->json(['message' => 'Successfully logged out']);
     }
 }
