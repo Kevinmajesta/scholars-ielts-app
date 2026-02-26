@@ -99,7 +99,7 @@ for the the api spec :)
 or http://localhost:8000/api/documentation for swagger UI
 ```
 
-## AI Quaetions
+## AI Question
 
 1. kira kira dari test diatas, table yg di pake apa aja yg hrus ku buat?
 2. UBAH CSRF DI LARAVEL KE JWT gmna chat?
