@@ -59,7 +59,7 @@ composer install
 5. Setup environment
 
 ```sh
-docker-compose up -dcp .env.example .env
+.env.example .env
 php artisan key:generate
 php artisan jwt:secret
 ```
