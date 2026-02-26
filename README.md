@@ -14,11 +14,11 @@ Proyek ini adalah sistem backend berbasis Laravel untuk aplikasi latihan soal IE
 
 2. Sistem Penilaian Otomatis: Menghitung skor berdasarkan jawaban user secara real-time.
 
-3. Otentikasi JWT: Registrasi dan login aman menggunakan tymon/jwt-auth.
+3. Otentikasi JWT: Registrasi dan login aman menggunakan jwt-auth.
 
 4. RBAC (Role-Based Access Control): Perbedaan hak akses antara user dan admin.
 
-5. Dokumentasi Swagger: Dokumentasi API interaktif yang dapat dicoba langsung melalui browser.
+5. Dokumentasi Swagger: Dokumentasi API interaktif yang dapat dicoba langsung melalui browser juga Postman sebagai test API external.
 
 ---
 
