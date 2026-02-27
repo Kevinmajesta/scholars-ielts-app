@@ -16,15 +16,19 @@ Proyek ini adalah sistem backend berbasis Laravel untuk aplikasi latihan soal IE
 
 3. Otentikasi JWT: Registrasi dan login aman menggunakan jwt-auth.
 
-4. RBAC (Role-Based Access Control): Perbedaan hak akses antara user dan admin.
+4. Email : Menggunakan SMTP Gmail untuk mengirimkan Hello saat regis dan NotifScore saat selesai menjawab.
 
-5. Dokumentasi Swagger: Dokumentasi API interaktif yang dapat dicoba langsung melalui browser juga Postman sebagai test API external.
+5. RBAC (Role-Based Access Control): Perbedaan hak akses antara user dan admin.
+
+6. Dokumentasi Swagger: Dokumentasi API interaktif yang dapat dicoba langsung melalui browser juga Postman sebagai test API external.
 
 ---
 
 ## Stack
 
 Framework: Laravel 11
+
+Email Sender : SMTP Gmail ( Saat regis & sent notifscore akan nunggu loading sekitar 1-2 detik dikarenakan masih menggunakan send biasa belum menggunakan queue/background job)
 
 Bahasa: PHP 8.x
 
@@ -34,7 +38,7 @@ Dokumentasi: L5-Swagger (OpenAPI 3.0)
 
 Otentikasi: JWT Auth
 
-## Installation 👨🏻
+## Installation 
 
 1. Clone Repository
    By use terminal/cmd
@@ -121,7 +125,8 @@ PS D:\Magang\scholars-ielts-app> php artisan l5-swagger:generate.
 PS D:\Magang\scholars-ielts-app> 
 ```
 9. Tolong Bikin readme project ini dari test yang kukirim diatas
-10. cara masukin image di readme gmn chat
+10. Password smtp apakah belum tanpa spasi chat, di laravel error klo pake spasi
+11. cara masukin image di readme gmn chat
 
 
 ## Relasi Database
