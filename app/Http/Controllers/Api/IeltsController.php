@@ -116,7 +116,7 @@ class IeltsController extends Controller
             $user = auth('api')->user();
             Mail::to($user->email)->send(new ScoreNotification($result));
         } catch (\Exception $e) {
-            \Log::error('Failed to send score email: ' . $e->getMessage());
+            \Log::error('Gagal mengirim email: ' . $e->getMessage());
         }
 
         return $this->sendResponse($result, 'Skor berhasil dihitung, disimpan, dan email terkirim');
@@ -205,7 +205,7 @@ class IeltsController extends Controller
     {
         $question = Question::find($id);
         if (!$question)
-            return $this->sendError('Question not found', 404);
+            return $this->sendError('Tidak dapat mendapatkan soal', 404);
 
         $question->delete();
         return $this->sendResponse(null, 'Soal berhasil dihapus');
