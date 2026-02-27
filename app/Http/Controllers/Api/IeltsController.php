@@ -26,6 +26,9 @@ class IeltsController extends Controller
     public function index()
     {
         $essays = Essay::with('questions.options')->get();
+        if ($essays->isEmpty()) {
+            return $this->sendError('Tidak ada essay yang tersedia', 404);
+        }
         return $this->sendResponse($essays, 'Daftar essay berhasil diambil');
     }
 
@@ -190,15 +193,25 @@ class IeltsController extends Controller
     public function getHistory()
     {
         $results = ExamResult::with('essay')->where('user_id', auth('api')->id())->get();
+        if ($results->isEmpty()) {
+            return $this->sendError('Riwayat nilai masih kosong', 404);
+        }
         return $this->sendResponse($results, 'Riwayat nilai berhasil diambil');
     }
 
     public function getHistoryByID($id)
     {
-        $result = ExamResult::with('essay')->where('user_id', auth('api')->id())->find($id);
+        $user = auth('api')->user();
+        $query = ExamResult::with(['essay', 'user']); 
+
+        if ($user->role !== 'admin') {
+            $query->where('user_id', $user->id);
+        }
+
+        $result = $query->find($id);
 
         if (!$result) {
-            return $this->sendError('Riwayat tidak ditemukan atau bukan milik Anda', 404);
+            return $this->sendError('Riwayat tidak ditemukan, ID salah, atau Anda tidak memiliki akses', 404);
         }
 
         return $this->sendResponse($result, 'Detail riwayat ditemukan');
