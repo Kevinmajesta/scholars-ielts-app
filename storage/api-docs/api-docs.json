@@ -1,17 +1,14 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "ScholarsToday IELTS API",
+        "title": "ScholarsToday IELTS API | Intern",
         "description": "Dokumentasi API",
-        "contact": {
-            "email": "kevinmajesta@example.com"
-        },
         "version": "1.0.0"
     },
     "servers": [
         {
             "url": "http://localhost:8000",
-            "description": "Development Server"
+            "description": "Local Server"
         }
     ],
     "paths": {

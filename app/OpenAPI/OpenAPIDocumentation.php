@@ -6,13 +6,12 @@ use OpenApi\Attributes as OA;
 
 #[OA\OpenApi(
     info: new OA\Info(
-        title: 'ScholarsToday IELTS API',
+        title: 'ScholarsToday IELTS API | Intern',
         description: 'Dokumentasi API',
         version: '1.0.0',
-        contact: new OA\Contact(email: 'kevinmajesta@example.com')
     ),
     servers: [
-        new OA\Server(url: 'http://localhost:8000', description: 'Development Server'),
+        new OA\Server(url: 'http://localhost:8000', description: 'Local Server'),
     ]
 )]
 #[OA\SecurityScheme(
