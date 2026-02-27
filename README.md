@@ -125,8 +125,9 @@ PS D:\Magang\scholars-ielts-app> php artisan l5-swagger:generate.
 PS D:\Magang\scholars-ielts-app> 
 ```
 9. Tolong Bikin readme project ini dari test yang kukirim diatas
-10. Password smtp apakah belum tanpa spasi chat, di laravel error klo pake spasi
-11. cara masukin image di readme gmn chat
+10. CHat apakah ietls ini ada question yang tanpa essay? atau semua question ake essay semua
+11. Password smtp apakah belum tanpa spasi chat, di laravel error klo pake spasi
+12. cara masukin image di readme gmn chat
 
 
 ## Relasi Database
