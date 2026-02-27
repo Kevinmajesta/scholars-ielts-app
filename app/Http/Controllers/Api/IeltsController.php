@@ -6,14 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Essay;
 use App\Models\Option;
 use App\Models\Question;
-use finfo;
-use Illuminate\Http\Request;
 use App\Models\ExamResult;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\DB;
-use OpenApi\Attributes as OA;
+use App\Traits\ApiResponse;      
 use App\Traits\IeltsSwaggerTrait;
 use App\Mail\ScoreNotification;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * @OA\Info(title="IELTS API", version="1.0.0")
@@ -22,11 +21,12 @@ use App\Mail\ScoreNotification;
  */
 class IeltsController extends Controller
 {
-    use IeltsSwaggerTrait;
+    use IeltsSwaggerTrait, ApiResponse;
+
     public function index()
     {
         $essays = Essay::with('questions.options')->get();
-        return response()->json(['success' => true, 'data' => $essays]);
+        return $this->sendResponse($essays, 'Daftar essay berhasil diambil');
     }
 
     public function showquestion($id)
@@ -34,27 +34,33 @@ class IeltsController extends Controller
         $question = Question::with(['essay', 'options'])->find($id);
 
         if (!$question) {
-            return response()->json(['message' => 'Soal tidak ditemukan'], 404);
+            return $this->sendError('Soal tidak ditemukan', 404);
         }
-        return response()->json([
-            'success' => true,
-            'data' => $question
-        ]);
+
+        return $this->sendResponse($question, 'Detail soal ditemukan');
     }
 
     public function show($id)
     {
         $essay = Essay::with('questions.options')->find($id);
-        if (!$essay)
-            return response()->json(['message' => 'Essay not found'], 404);
-        return response()->json(['success' => true, 'data' => $essay]);
-    }
+        
+        if (!$essay) {
+            return $this->sendError('Essay tidak ditemukan', 404);
+        }
 
+        return $this->sendResponse($essay, 'Detail essay ditemukan');
+    }
     public function submit(Request $request)
     {
+        $request->validate([
+            'essay_id' => 'required|exists:essays,id',
+            'answers' => 'required|array'
+        ]);
+
         $userAnswers = $request->input('answers', []);
-        if (empty($userAnswers))
-            return response()->json(['message' => 'Jawaban kosong'], 400);
+        if (empty($userAnswers)) {
+            return $this->sendError('Jawaban kosong', 400);
+        }
 
         $totalQuestions = count($userAnswers);
         $optionIds = collect($userAnswers)->pluck('option_id');
@@ -66,14 +72,13 @@ class IeltsController extends Controller
         foreach ($userAnswers as $answer) {
             $option = $options->get($answer['option_id']);
             $isCorrect = $option && $option->is_correct && $option->question_id == $answer['question_id'];
-            if ($isCorrect)
-                $correctCount++;
+            if ($isCorrect) $correctCount++;
             $details[] = ['question_id' => $answer['question_id'], 'is_correct' => $isCorrect];
         }
 
-        $score = ($correctCount / $totalQuestions) * 100;
+        $score = ($totalQuestions > 0) ? ($correctCount / $totalQuestions) * 100 : 0;
 
-        $result = \App\Models\ExamResult::create([
+        $result = ExamResult::create([
             'user_id' => auth('api')->id(),
             'essay_id' => $request->essay_id,
             'total_questions' => $totalQuestions,
@@ -86,10 +91,10 @@ class IeltsController extends Controller
             $user = auth('api')->user();
             Mail::to($user->email)->send(new ScoreNotification($result));
         } catch (\Exception $e) {
-                \Log::error('Failed to send score email: ' . $e->getMessage());
+            \Log::error('Failed to send score email: ' . $e->getMessage());
         }
 
-        return response()->json(['success' => true, 'results' => $result]);
+        return $this->sendResponse($result, 'Skor berhasil dihitung, disimpan, dan email terkirim');
     }
 
     public function store(Request $request)
@@ -115,23 +120,18 @@ class IeltsController extends Controller
             return $essay;
         });
 
-        return response()->json(['success' => true, 'data' => $essay->load('questions.options')], 201);
+        return $this->sendResponse($essay->load('questions.options'), 'Essay berhasil dibuat', 201);
     }
 
     public function update(Request $request, $id)
     {
         $essay = Essay::find($id);
-        if (!$essay)
-            return response()->json(['message' => 'Essay not found'], 404);
+        if (!$essay) return $this->sendError('Essay not found', 404);
 
         $validated = $request->validate([
             'title' => 'required|string',
             'content' => 'required|string',
             'questions' => 'required|array',
-            'questions.*.question_text' => 'required|string',
-            'questions.*.options' => 'required|array|min:2',
-            'questions.*.options.*.option_text' => 'required|string',
-            'questions.*.options.*.is_correct' => 'required|boolean',
         ]);
 
         DB::transaction(function () use ($essay, $validated) {
@@ -145,29 +145,32 @@ class IeltsController extends Controller
             }
         });
 
-        return response()->json(['success' => true, 'data' => $essay->load('questions.options')], 200);
+        return $this->sendResponse($essay->load('questions.options'), 'Essay berhasil diperbarui');
     }
 
     public function destroy($id)
     {
         $question = Question::find($id);
-        if (!$question)
-            return response()->json(['message' => 'Question not found'], 404);
+        if (!$question) return $this->sendError('Question not found', 404);
+        
         $question->delete();
-        return response()->json(['success' => true, 'message' => 'Deleted successfully']);
+        return $this->sendResponse(null, 'Soal berhasil dihapus');
     }
 
     public function getHistory()
     {
         $results = ExamResult::with('essay')->where('user_id', auth('api')->id())->get();
-        return response()->json(['success' => true, 'data' => $results]);
+        return $this->sendResponse($results, 'Riwayat nilai berhasil diambil');
     }
 
     public function getHistoryByID($id)
     {
         $result = ExamResult::with('essay')->where('user_id', auth('api')->id())->find($id);
-        if (!$result)
-            return response()->json(['message' => 'Result / User not found'], 404);
-        return response()->json(['success' => true, 'data' => $result]);
+        
+        if (!$result) {
+            return $this->sendError('Riwayat tidak ditemukan atau bukan milik Anda', 404);
+        }
+
+        return $this->sendResponse($result, 'Detail riwayat ditemukan');
     }
 }
