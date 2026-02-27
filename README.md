@@ -16,15 +16,19 @@ Proyek ini adalah sistem backend berbasis Laravel untuk aplikasi latihan soal IE
 
 3. Otentikasi JWT: Registrasi dan login aman menggunakan jwt-auth.
 
-4. RBAC (Role-Based Access Control): Perbedaan hak akses antara user dan admin.
+4. Email : Menggunakan SMTP Gmail untuk mengirimkan Hello saat regis dan NotifScore saat selesai menjawab.
 
-5. Dokumentasi Swagger: Dokumentasi API interaktif yang dapat dicoba langsung melalui browser juga Postman sebagai test API external.
+5. RBAC (Role-Based Access Control): Perbedaan hak akses antara user dan admin.
+
+6. Dokumentasi Swagger: Dokumentasi API interaktif yang dapat dicoba langsung melalui browser juga Postman sebagai test API external.
 
 ---
 
 ## Stack
 
 Framework: Laravel 11
+
+Email Sender : SMTP Gmail
 
 Bahasa: PHP 8.x
 
