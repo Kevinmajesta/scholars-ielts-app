@@ -7,7 +7,7 @@ use App\Models\Essay;
 use App\Models\Option;
 use App\Models\Question;
 use App\Models\ExamResult;
-use App\Traits\ApiResponse;      
+use App\Traits\ApiResponse;
 use App\Traits\IeltsSwaggerTrait;
 use App\Mail\ScoreNotification;
 use Illuminate\Http\Request;
@@ -43,7 +43,7 @@ class IeltsController extends Controller
     public function show($id)
     {
         $essay = Essay::with('questions.options')->find($id);
-        
+
         if (!$essay) {
             return $this->sendError('Essay tidak ditemukan', 404);
         }
@@ -72,7 +72,8 @@ class IeltsController extends Controller
         foreach ($userAnswers as $answer) {
             $option = $options->get($answer['option_id']);
             $isCorrect = $option && $option->is_correct && $option->question_id == $answer['question_id'];
-            if ($isCorrect) $correctCount++;
+            if ($isCorrect)
+                $correctCount++;
             $details[] = ['question_id' => $answer['question_id'], 'is_correct' => $isCorrect];
         }
 
@@ -100,9 +101,9 @@ class IeltsController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string',
-            'content' => 'required|string',
-            'questions' => 'required|array',
+            'title' => 'nullable|string',
+            'content' => 'nullable|string',
+            'questions' => 'required|array|min:1',
             'questions.*.question_text' => 'required|string',
             'questions.*.options' => 'required|array|min:2',
             'questions.*.options.*.option_text' => 'required|string',
@@ -110,9 +111,16 @@ class IeltsController extends Controller
         ]);
 
         $essay = DB::transaction(function () use ($validated) {
-            $essay = Essay::create(['title' => $validated['title'], 'content' => $validated['content']]);
+            $essay = Essay::create([
+                'title' => $validated['title'] ?? 'Standalone Question ' . now()->format('d/m/Y H:i'),
+                'content' => $validated['content'] ?? '-'
+            ]);
+
             foreach ($validated['questions'] as $qData) {
-                $question = $essay->questions()->create(['question_text' => $qData['question_text']]);
+                $question = $essay->questions()->create([
+                    'question_text' => $qData['question_text']
+                ]);
+
                 foreach ($qData['options'] as $oData) {
                     $question->options()->create($oData);
                 }
@@ -120,39 +128,61 @@ class IeltsController extends Controller
             return $essay;
         });
 
-        return $this->sendResponse($essay->load('questions.options'), 'Essay berhasil dibuat', 201);
+        return $this->sendResponse(
+            $essay->load('questions.options'),
+            'Data berhasil dibuat' . ($request->title ? '' : ' (Tanpa Essay)'),
+            201
+        );
     }
 
     public function update(Request $request, $id)
     {
         $essay = Essay::find($id);
-        if (!$essay) return $this->sendError('Essay not found', 404);
+        if (!$essay) {
+            return $this->sendError('Data tidak ditemukan', 404);
+        }
 
         $validated = $request->validate([
-            'title' => 'required|string',
-            'content' => 'required|string',
-            'questions' => 'required|array',
+            'title' => 'nullable|string',
+            'content' => 'nullable|string',
+            'questions' => 'required|array|min:1',
+            'questions.*.question_text' => 'required|string',
+            'questions.*.options' => 'required|array|min:2',
+            'questions.*.options.*.option_text' => 'required|string',
+            'questions.*.options.*.is_correct' => 'required|boolean',
         ]);
 
         DB::transaction(function () use ($essay, $validated) {
-            $essay->update(['title' => $validated['title'], 'content' => $validated['content']]);
+            $essay->update([
+                'title' => $validated['title'] ?? $essay->title, 
+                'content' => $validated['content'] ?? '-'
+            ]);
+
             $essay->questions()->delete();
+
             foreach ($validated['questions'] as $qData) {
-                $question = $essay->questions()->create(['question_text' => $qData['question_text']]);
+                $question = $essay->questions()->create([
+                    'question_text' => $qData['question_text']
+                ]);
+
                 foreach ($qData['options'] as $oData) {
                     $question->options()->create($oData);
                 }
             }
         });
 
-        return $this->sendResponse($essay->load('questions.options'), 'Essay berhasil diperbarui');
+        return $this->sendResponse(
+            $essay->load('questions.options'),
+            'Data berhasil diperbarui'
+        );
     }
 
     public function destroy($id)
     {
         $question = Question::find($id);
-        if (!$question) return $this->sendError('Question not found', 404);
-        
+        if (!$question)
+            return $this->sendError('Question not found', 404);
+
         $question->delete();
         return $this->sendResponse(null, 'Soal berhasil dihapus');
     }
@@ -166,7 +196,7 @@ class IeltsController extends Controller
     public function getHistoryByID($id)
     {
         $result = ExamResult::with('essay')->where('user_id', auth('api')->id())->find($id);
-        
+
         if (!$result) {
             return $this->sendError('Riwayat tidak ditemukan atau bukan milik Anda', 404);
         }

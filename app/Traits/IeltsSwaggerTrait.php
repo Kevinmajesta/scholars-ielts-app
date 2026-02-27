@@ -85,10 +85,39 @@ trait IeltsSwaggerTrait
         path: '/api/admin/ielts/essays',
         operationId: 'createEssay',
         tags: ['IELTS Admin'],
-        summary: 'Admin: Tambah Soal Baru',
+        summary: 'Admin: Tambah Soal Baru (Essay Opsional)',
         security: [['bearerAuth' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['questions'],
+                properties: [
+                    new OA\Property(property: 'title', type: 'string', example: 'Judul Essay (Kosongkan jika standalone)', nullable: true),
+                    new OA\Property(property: 'content', type: 'string', example: 'Isi Teks Bacaan...', nullable: true),
+                    new OA\Property(
+                        property: 'questions',
+                        type: 'array',
+                        items: new OA\Items(
+                            properties: [
+                                new OA\Property(property: 'question_text', type: 'string', example: 'Pertanyaannya?'),
+                                new OA\Property(
+                                    property: 'options',
+                                    type: 'array',
+                                    items: new OA\Items(
+                                        properties: [
+                                            new OA\Property(property: 'option_text', type: 'string', example: 'Pilihan A'),
+                                            new OA\Property(property: 'is_correct', type: 'boolean', example: true)
+                                        ]
+                                    )
+                                )
+                            ]
+                        )
+                    )
+                ]
+            )
+        ),
         responses: [
-            new OA\Response(response: 201, description: 'Created')
+            new OA\Response(response: 201, description: 'Data Berhasil Dibuat')
         ]
     )]
     public function storeDoc() {}
@@ -102,6 +131,17 @@ trait IeltsSwaggerTrait
         parameters: [
             new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
         ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['questions'],
+                properties: [
+                    new OA\Property(property: 'title', type: 'string', nullable: true),
+                    new OA\Property(property: 'content', type: 'string', nullable: true),
+                    new OA\Property(property: 'questions', type: 'array', items: new OA\Items(type: 'object'))
+                ]
+            )
+        ),
         responses: [
             new OA\Response(response: 200, description: 'Updated')
         ]
@@ -130,8 +170,7 @@ trait IeltsSwaggerTrait
         summary: 'Admin: Ambil semua riwayat ujian seluruh user',
         security: [['bearerAuth' => []]],
         responses: [
-            new OA\Response(response: 200, description: 'Berhasil ambil semua data'),
-            new OA\Response(response: 403, description: 'Forbidden (Bukan Admin)')
+            new OA\Response(response: 200, description: 'Berhasil ambil semua data')
         ]
     )]
     public function getHistoryDoc() {}
@@ -146,8 +185,7 @@ trait IeltsSwaggerTrait
             new OA\Parameter(name: 'id', in: 'path', required: true, description: 'ID Exam Result', schema: new OA\Schema(type: 'integer'))
         ],
         responses: [
-            new OA\Response(response: 200, description: 'Berhasil'),
-            new OA\Response(response: 404, description: 'Data tidak ditemukan')
+            new OA\Response(response: 200, description: 'Berhasil')
         ]
     )]
     public function getHistoryByIDDoc() {}

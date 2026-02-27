@@ -342,11 +342,64 @@
                 "tags": [
                     "IELTS Admin"
                 ],
-                "summary": "Admin: Tambah Soal Baru",
+                "summary": "Admin: Tambah Soal Baru (Essay Opsional)",
                 "operationId": "createEssay",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "questions"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Judul Essay (Kosongkan jika standalone)",
+                                        "nullable": true
+                                    },
+                                    "content": {
+                                        "type": "string",
+                                        "example": "Isi Teks Bacaan...",
+                                        "nullable": true
+                                    },
+                                    "questions": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "question_text": {
+                                                    "type": "string",
+                                                    "example": "Pertanyaannya?"
+                                                },
+                                                "options": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "option_text": {
+                                                                "type": "string",
+                                                                "example": "Pilihan A"
+                                                            },
+                                                            "is_correct": {
+                                                                "type": "boolean",
+                                                                "example": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": "Data Berhasil Dibuat"
                     }
                 },
                 "security": [
@@ -373,6 +426,35 @@
                         }
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "questions"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "content": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "questions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Updated"
@@ -424,9 +506,6 @@
                 "responses": {
                     "200": {
                         "description": "Berhasil ambil semua data"
-                    },
-                    "403": {
-                        "description": "Forbidden (Bukan Admin)"
                     }
                 },
                 "security": [
@@ -457,9 +536,6 @@
                 "responses": {
                     "200": {
                         "description": "Berhasil"
-                    },
-                    "404": {
-                        "description": "Data tidak ditemukan"
                     }
                 },
                 "security": [
