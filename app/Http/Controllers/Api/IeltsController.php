@@ -23,13 +23,34 @@ class IeltsController extends Controller
 {
     use IeltsSwaggerTrait, ApiResponse;
 
-    public function index()
+    public function index(Request $request)
     {
-        $essays = Essay::with('questions.options')->get();
-        if ($essays->isEmpty()) {
+        $user = auth('api')->user();
+
+        $query = Essay::with([
+            'questions.options' => function ($q) {
+                $q->inRandomOrder();
+            }
+        ]);
+
+        if ($user->role === 'admin') {
+            if ($request->has('search')) {
+                $query->where('title', 'LIKE', '%' . $request->search . '%');
+            }
+
+            $limit = $request->input('limit', 10);
+            $data = $query->paginate($limit);
+        } else {
+            $data = $query->get();
+        }
+
+        $isEmpty = ($user->role === 'admin') ? ($data->total() === 0) : $data->isEmpty();
+
+        if ($isEmpty) {
             return $this->sendError('Tidak ada essay yang tersedia', 404);
         }
-        return $this->sendResponse($essays, 'Daftar essay berhasil diambil');
+
+        return $this->sendResponse($data, 'Daftar essay berhasil diambil');
     }
 
     public function showquestion($id)
@@ -157,7 +178,7 @@ class IeltsController extends Controller
 
         DB::transaction(function () use ($essay, $validated) {
             $essay->update([
-                'title' => $validated['title'] ?? $essay->title, 
+                'title' => $validated['title'] ?? $essay->title,
                 'content' => $validated['content'] ?? '-'
             ]);
 
@@ -202,7 +223,7 @@ class IeltsController extends Controller
     public function getHistoryByID($id)
     {
         $user = auth('api')->user();
-        $query = ExamResult::with(['essay', 'user']); 
+        $query = ExamResult::with(['essay', 'user']);
 
         if ($user->role !== 'admin') {
             $query->where('user_id', $user->id);
