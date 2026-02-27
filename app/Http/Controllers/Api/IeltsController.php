@@ -7,85 +7,27 @@ use App\Models\Essay;
 use App\Models\Option;
 use App\Models\Question;
 use Illuminate\Http\Request;
+use App\Models\ExamResult;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use OpenApi\Attributes as OA;
+use App\Traits\IeltsSwaggerTrait;
+use App\Mail\ScoreNotification;
 
+/**
+ * @OA\Info(title="IELTS API", version="1.0.0")
+ * @OA\Server(url="http://127.0.0.1:8000", description="Local Server")
+ * @OA\SecurityScheme(securityScheme="bearerAuth", type="http", scheme="bearer", bearerFormat="JWT")
+ */
 class IeltsController extends Controller
 {
-    #[OA\Get(
-        path: '/api/ielts/questions',
-        operationId: 'getIeltsList',
-        tags: ['IELTS'],
-        summary: 'Ambil daftar semua essay dan soal',
-        security: [['bearerAuth' => []]],
-        responses: [
-            new OA\Response(response: 200, description: 'Berhasil ambil data'),
-        ]
-    )]
+    use IeltsSwaggerTrait;
     public function index()
     {
         $essays = Essay::with('questions.options')->get();
         return response()->json(['success' => true, 'data' => $essays]);
     }
 
-    #[OA\Get(
-        path: '/api/ielts/questions/{id}',
-        operationId: 'getSingleQuestionDetail',
-        tags: ['IELTS'],
-        summary: 'Ambil 1 soal spesifik beserta judul essay dan pilihannya',
-        description: 'Endpoint ini mengembalikan satu objek soal saja, lengkap dengan data essay (title, content) dan options soal tersebut.',
-        security: [['bearerAuth' => []]],
-        parameters: [
-            new OA\Parameter(
-                name: 'id',
-                in: 'path',
-                required: true,
-                description: 'ID dari Soal (Question)',
-                schema: new OA\Schema(type: 'integer', example: 1)
-            ),
-        ],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: 'Berhasil mengambil detail soal',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: 'success', type: 'boolean', example: true),
-                        new OA\Property(
-                            property: 'data',
-                            type: 'object',
-                            properties: [
-                                new OA\Property(property: 'id', type: 'integer', example: 1),
-                                new OA\Property(property: 'question_text', type: 'string', example: 'What is the main topic?'),
-                                new OA\Property(
-                                    property: 'essay',
-                                    type: 'object',
-                                    properties: [
-                                        new OA\Property(property: 'id', type: 'integer', example: 1),
-                                        new OA\Property(property: 'title', type: 'string', example: 'History of AI'),
-                                        new OA\Property(property: 'content', type: 'string', example: 'The history of AI starts...')
-                                    ]
-                                ),
-                                new OA\Property(
-                                    property: 'options',
-                                    type: 'array',
-                                    items: new OA\Items(
-                                        properties: [
-                                            new OA\Property(property: 'id', type: 'integer', example: 1),
-                                            new OA\Property(property: 'option_text', type: 'string', example: 'Technology'),
-                                            new OA\Property(property: 'is_correct', type: 'boolean', example: true)
-                                        ]
-                                    )
-                                )
-                            ]
-                        )
-                    ]
-                )
-            ),
-            new OA\Response(response: 404, description: 'Soal tidak ditemukan'),
-            new OA\Response(response: 401, description: 'Unauthenticated (Token salah/kosong)')
-        ]
-    )]
     public function showquestion($id)
     {
         $question = Question::with(['essay', 'options'])->find($id);
@@ -99,20 +41,6 @@ class IeltsController extends Controller
         ]);
     }
 
-    #[OA\Get(
-        path: '/api/ielts/essays/{id}',
-        operationId: 'getIeltsDetail',
-        tags: ['IELTS'],
-        summary: 'Ambil detail soal berdasarkan ID',
-        security: [['bearerAuth' => []]],
-        parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, description: 'ID Essay', schema: new OA\Schema(type: 'integer')),
-        ],
-        responses: [
-            new OA\Response(response: 200, description: 'Berhasil ambil data'),
-            new OA\Response(response: 404, description: 'Essay tidak ditemukan'),
-        ]
-    )]
     public function show($id)
     {
         $essay = Essay::with('questions.options')->find($id);
@@ -121,37 +49,6 @@ class IeltsController extends Controller
         return response()->json(['success' => true, 'data' => $essay]);
     }
 
-    #[OA\Post(
-        path: '/api/ielts/submit',
-        operationId: 'submitAnswers',
-        tags: ['IELTS'],
-        summary: 'Submit Jawaban & Hitung Skor',
-        security: [['bearerAuth' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                properties: [
-
-                    new OA\Property(property: 'essay_id', type: 'integer', example: 1),
-                    new OA\Property(
-                        property: 'answers',
-                        type: 'array',
-                        items: new OA\Items(
-                            properties: [
-                                new OA\Property(property: 'question_id', type: 'integer', example: 1),
-                                new OA\Property(property: 'option_id', type: 'integer', example: 2),
-                            ],
-                            type: 'object'
-                        )
-                    ),
-                ]
-            )
-        ),
-        responses: [
-            new OA\Response(response: 200, description: 'Skor dihitung dan disimpan'),
-            new OA\Response(response: 400, description: 'Data tidak lengkap atau ID salah'),
-        ]
-    )]
     public function submit(Request $request)
     {
         $userAnswers = $request->input('answers', []);
@@ -184,91 +81,16 @@ class IeltsController extends Controller
             'details' => $details
         ]);
 
+        try {
+            $user = auth('api')->user();
+            Mail::to($user->email)->send(new ScoreNotification($result));
+        } catch (\Exception $e) {
+                \Log::error('Failed to send score email: ' . $e->getMessage());
+        }
+
         return response()->json(['success' => true, 'results' => $result]);
     }
 
-    #[OA\Post(
-        path: '/api/admin/ielts/essays',
-        operationId: 'createEssay',
-        tags: ['IELTS Admin'],
-        summary: 'Tambah Soal Baru (Admin)',
-        security: [['bearerAuth' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['title', 'content', 'questions'],
-                properties: [
-                    new OA\Property(property: 'title', type: 'string', example: 'IELTS Reading Test 1'),
-                    new OA\Property(property: 'content', type: 'string', example: 'Read the following passage and answer the questions...'),
-                    new OA\Property(
-                        property: 'questions',
-                        type: 'array',
-                        items: new OA\Items(
-                            required: ['question_text', 'options'],
-                            properties: [
-                                new OA\Property(property: 'question_text', type: 'string', example: 'What is the main idea of the passage?'),
-                                new OA\Property(
-                                    property: 'options',
-                                    type: 'array',
-                                    items: new OA\Items(
-                                        required: ['option_text', 'is_correct'],
-                                        properties: [
-                                            new OA\Property(property: 'option_text', type: 'string', example: 'Climate change impacts'),
-                                            new OA\Property(property: 'is_correct', type: 'boolean', example: true),
-                                        ],
-                                        type: 'object'
-                                    )
-                                ),
-                            ],
-                            type: 'object'
-                        ),
-                        example: [
-                            [
-                                'question_text' => 'What is the main idea of the passage?',
-                                'options' => [
-                                    ['option_text' => 'Climate change impacts', 'is_correct' => true],
-                                    ['option_text' => 'Global warming myths', 'is_correct' => false],
-                                    ['option_text' => 'Environmental policies', 'is_correct' => false],
-                                    ['option_text' => 'Renewable energy sources', 'is_correct' => false],
-                                ],
-                            ],
-                            [
-                                'question_text' => 'According to the text, what year was mentioned?',
-                                'options' => [
-                                    ['option_text' => '2020', 'is_correct' => false],
-                                    ['option_text' => '2021', 'is_correct' => true],
-                                    ['option_text' => '2022', 'is_correct' => false],
-                                    ['option_text' => '2023', 'is_correct' => false],
-                                ],
-                            ],
-                        ]
-                    ),
-                ]
-            )
-        ),
-        responses: [
-            new OA\Response(
-                response: 201,
-                description: 'Soal Dibuat',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: 'success', type: 'boolean', example: true),
-                        new OA\Property(property: 'data', type: 'object'),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 422,
-                description: 'Validation Error',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: 'message', type: 'string', example: 'The questions field is required.'),
-                        new OA\Property(property: 'errors', type: 'object'),
-                    ]
-                )
-            ),
-        ]
-    )]
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -295,119 +117,6 @@ class IeltsController extends Controller
         return response()->json(['success' => true, 'data' => $essay->load('questions.options')], 201);
     }
 
-    #[OA\Put(
-        path: '/api/admin/ielts/essays/{id}',
-        operationId: 'updateEssay',
-        tags: ['IELTS Admin'],
-        summary: 'Update Essay dan Soal (Admin)',
-        security: [['bearerAuth' => []]],
-        parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, description: 'ID Essay', schema: new OA\Schema(type: 'integer')),
-        ],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['title', 'content', 'questions'],
-                properties: [
-                    new OA\Property(property: 'title', type: 'string', example: 'IELTS Reading Test 1 - Updated'),
-                    new OA\Property(property: 'content', type: 'string', example: 'Updated passage text about environmental issues...'),
-                    new OA\Property(
-                        property: 'questions',
-                        type: 'array',
-                        example: [
-                            [
-                                'question_text' => 'What is the updated main idea of the passage?',
-                                'options' => [
-                                    ['option_text' => 'Climate change impacts', 'is_correct' => true],
-                                    ['option_text' => 'Economic benefits', 'is_correct' => false],
-                                    ['option_text' => 'Political changes', 'is_correct' => false],
-                                    ['option_text' => 'Social movements', 'is_correct' => false],
-                                ]
-                            ],
-                            [
-                                'question_text' => 'According to the updated passage, what is the author\'s perspective?',
-                                'options' => [
-                                    ['option_text' => 'Supportive of change', 'is_correct' => false],
-                                    ['option_text' => 'Critical of current policies', 'is_correct' => true],
-                                    ['option_text' => 'Neutral observer', 'is_correct' => false],
-                                    ['option_text' => 'Pessimistic view', 'is_correct' => false],
-                                ]
-                            ]
-                        ],
-                        items: new OA\Items(
-                            required: ['question_text', 'options'],
-                            properties: [
-                                new OA\Property(property: 'question_text', type: 'string', example: 'What is the main idea?'),
-                                new OA\Property(
-                                    property: 'options',
-                                    type: 'array',
-                                    example: [
-                                        ['option_text' => 'Option A', 'is_correct' => true],
-                                        ['option_text' => 'Option B', 'is_correct' => false]
-                                    ],
-                                    items: new OA\Items(
-                                        required: ['option_text', 'is_correct'],
-                                        properties: [
-                                            new OA\Property(property: 'option_text', type: 'string', example: 'Answer option text'),
-                                            new OA\Property(property: 'is_correct', type: 'boolean', example: false),
-                                        ],
-                                        type: 'object'
-                                    )
-                                ),
-                            ],
-                            type: 'object'
-                        )
-                    ),
-                ]
-            )
-        ),
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: 'Essay berhasil diperbarui',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: 'message', type: 'string', example: 'Essay updated successfully'),
-                        new OA\Property(
-                            property: 'essay',
-                            type: 'object',
-                            properties: [
-                                new OA\Property(property: 'id', type: 'integer', example: 1),
-                                new OA\Property(property: 'title', type: 'string', example: 'IELTS Reading Test 1 - Updated'),
-                                new OA\Property(property: 'content', type: 'string', example: 'Updated passage text...'),
-                            ]
-                        )
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 404,
-                description: 'Essay tidak ditemukan',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: 'message', type: 'string', example: 'Essay not found')
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 422,
-                description: 'Validation Error',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: 'message', type: 'string', example: 'The title field is required. (and 1 more error)'),
-                        new OA\Property(
-                            property: 'errors',
-                            type: 'object',
-                            properties: [
-                                new OA\Property(property: 'title', type: 'array', items: new OA\Items(type: 'string', example: 'The title field is required.')),
-                                new OA\Property(property: 'questions', type: 'array', items: new OA\Items(type: 'string', example: 'The questions field is required.')),
-                            ]
-                        )
-                    ]
-                )
-            ),
-        ]
-    )]
     public function update(Request $request, $id)
     {
         $essay = Essay::find($id);
@@ -438,19 +147,6 @@ class IeltsController extends Controller
         return response()->json(['success' => true, 'data' => $essay->load('questions.options')], 200);
     }
 
-    #[OA\Delete(
-        path: '/api/admin/ielts/essays/{id}',
-        operationId: 'deleteEssay',
-        tags: ['IELTS Admin'],
-        summary: 'Hapus Essay',
-        security: [['bearerAuth' => []]],
-        parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, description: 'ID Essay', schema: new OA\Schema(type: 'integer')),
-        ],
-        responses: [
-            new OA\Response(response: 200, description: 'Berhasil Hapus'),
-        ]
-    )]
     public function destroy($id)
     {
         $question = Question::find($id);

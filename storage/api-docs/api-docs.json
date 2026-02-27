@@ -15,626 +15,6 @@
         }
     ],
     "paths": {
-        "/api/ielts/questions": {
-            "get": {
-                "tags": [
-                    "IELTS"
-                ],
-                "summary": "Ambil daftar semua essay dan soal",
-                "operationId": "getIeltsList",
-                "responses": {
-                    "200": {
-                        "description": "Berhasil ambil data"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/ielts/questions/{id}": {
-            "get": {
-                "tags": [
-                    "IELTS"
-                ],
-                "summary": "Ambil 1 soal spesifik beserta judul essay dan pilihannya",
-                "description": "Endpoint ini mengembalikan satu objek soal saja, lengkap dengan data essay (title, content) dan options soal tersebut.",
-                "operationId": "getSingleQuestionDetail",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID dari Soal (Question)",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Berhasil mengambil detail soal",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "question_text": {
-                                                    "type": "string",
-                                                    "example": "What is the main topic?"
-                                                },
-                                                "essay": {
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "integer",
-                                                            "example": 1
-                                                        },
-                                                        "title": {
-                                                            "type": "string",
-                                                            "example": "History of AI"
-                                                        },
-                                                        "content": {
-                                                            "type": "string",
-                                                            "example": "The history of AI starts..."
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                },
-                                                "options": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "integer",
-                                                                "example": 1
-                                                            },
-                                                            "option_text": {
-                                                                "type": "string",
-                                                                "example": "Technology"
-                                                            },
-                                                            "is_correct": {
-                                                                "type": "boolean",
-                                                                "example": true
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Soal tidak ditemukan"
-                    },
-                    "401": {
-                        "description": "Unauthenticated (Token salah/kosong)"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/ielts/essays/{id}": {
-            "get": {
-                "tags": [
-                    "IELTS"
-                ],
-                "summary": "Ambil detail soal berdasarkan ID",
-                "operationId": "getIeltsDetail",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID Essay",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Berhasil ambil data"
-                    },
-                    "404": {
-                        "description": "Essay tidak ditemukan"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/ielts/submit": {
-            "post": {
-                "tags": [
-                    "IELTS"
-                ],
-                "summary": "Submit Jawaban & Hitung Skor",
-                "operationId": "submitAnswers",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "essay_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "answers": {
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "question_id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "option_id": {
-                                                    "type": "integer",
-                                                    "example": 2
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Skor dihitung dan disimpan"
-                    },
-                    "400": {
-                        "description": "Data tidak lengkap atau ID salah"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/admin/ielts/essays": {
-            "post": {
-                "tags": [
-                    "IELTS Admin"
-                ],
-                "summary": "Tambah Soal Baru (Admin)",
-                "operationId": "createEssay",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "title",
-                                    "content",
-                                    "questions"
-                                ],
-                                "properties": {
-                                    "title": {
-                                        "type": "string",
-                                        "example": "IELTS Reading Test 1"
-                                    },
-                                    "content": {
-                                        "type": "string",
-                                        "example": "Read the following passage and answer the questions..."
-                                    },
-                                    "questions": {
-                                        "type": "array",
-                                        "items": {
-                                            "required": [
-                                                "question_text",
-                                                "options"
-                                            ],
-                                            "properties": {
-                                                "question_text": {
-                                                    "type": "string",
-                                                    "example": "What is the main idea of the passage?"
-                                                },
-                                                "options": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "required": [
-                                                            "option_text",
-                                                            "is_correct"
-                                                        ],
-                                                        "properties": {
-                                                            "option_text": {
-                                                                "type": "string",
-                                                                "example": "Climate change impacts"
-                                                            },
-                                                            "is_correct": {
-                                                                "type": "boolean",
-                                                                "example": true
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "example": [
-                                            {
-                                                "question_text": "What is the main idea of the passage?",
-                                                "options": [
-                                                    {
-                                                        "option_text": "Climate change impacts",
-                                                        "is_correct": true
-                                                    },
-                                                    {
-                                                        "option_text": "Global warming myths",
-                                                        "is_correct": false
-                                                    },
-                                                    {
-                                                        "option_text": "Environmental policies",
-                                                        "is_correct": false
-                                                    },
-                                                    {
-                                                        "option_text": "Renewable energy sources",
-                                                        "is_correct": false
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "question_text": "According to the text, what year was mentioned?",
-                                                "options": [
-                                                    {
-                                                        "option_text": "2020",
-                                                        "is_correct": false
-                                                    },
-                                                    {
-                                                        "option_text": "2021",
-                                                        "is_correct": true
-                                                    },
-                                                    {
-                                                        "option_text": "2022",
-                                                        "is_correct": false
-                                                    },
-                                                    {
-                                                        "option_text": "2023",
-                                                        "is_correct": false
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Soal Dibuat",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "The questions field is required."
-                                        },
-                                        "errors": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/admin/ielts/essays/{id}": {
-            "put": {
-                "tags": [
-                    "IELTS Admin"
-                ],
-                "summary": "Update Essay dan Soal (Admin)",
-                "operationId": "updateEssay",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID Essay",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "title",
-                                    "content",
-                                    "questions"
-                                ],
-                                "properties": {
-                                    "title": {
-                                        "type": "string",
-                                        "example": "IELTS Reading Test 1 - Updated"
-                                    },
-                                    "content": {
-                                        "type": "string",
-                                        "example": "Updated passage text about environmental issues..."
-                                    },
-                                    "questions": {
-                                        "type": "array",
-                                        "items": {
-                                            "required": [
-                                                "question_text",
-                                                "options"
-                                            ],
-                                            "properties": {
-                                                "question_text": {
-                                                    "type": "string",
-                                                    "example": "What is the main idea?"
-                                                },
-                                                "options": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "required": [
-                                                            "option_text",
-                                                            "is_correct"
-                                                        ],
-                                                        "properties": {
-                                                            "option_text": {
-                                                                "type": "string",
-                                                                "example": "Answer option text"
-                                                            },
-                                                            "is_correct": {
-                                                                "type": "boolean",
-                                                                "example": false
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    },
-                                                    "example": [
-                                                        {
-                                                            "option_text": "Option A",
-                                                            "is_correct": true
-                                                        },
-                                                        {
-                                                            "option_text": "Option B",
-                                                            "is_correct": false
-                                                        }
-                                                    ]
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "example": [
-                                            {
-                                                "question_text": "What is the updated main idea of the passage?",
-                                                "options": [
-                                                    {
-                                                        "option_text": "Climate change impacts",
-                                                        "is_correct": true
-                                                    },
-                                                    {
-                                                        "option_text": "Economic benefits",
-                                                        "is_correct": false
-                                                    },
-                                                    {
-                                                        "option_text": "Political changes",
-                                                        "is_correct": false
-                                                    },
-                                                    {
-                                                        "option_text": "Social movements",
-                                                        "is_correct": false
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "question_text": "According to the updated passage, what is the author's perspective?",
-                                                "options": [
-                                                    {
-                                                        "option_text": "Supportive of change",
-                                                        "is_correct": false
-                                                    },
-                                                    {
-                                                        "option_text": "Critical of current policies",
-                                                        "is_correct": true
-                                                    },
-                                                    {
-                                                        "option_text": "Neutral observer",
-                                                        "is_correct": false
-                                                    },
-                                                    {
-                                                        "option_text": "Pessimistic view",
-                                                        "is_correct": false
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Essay berhasil diperbarui",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Essay updated successfully"
-                                        },
-                                        "essay": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "title": {
-                                                    "type": "string",
-                                                    "example": "IELTS Reading Test 1 - Updated"
-                                                },
-                                                "content": {
-                                                    "type": "string",
-                                                    "example": "Updated passage text..."
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Essay tidak ditemukan",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Essay not found"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "The title field is required. (and 1 more error)"
-                                        },
-                                        "errors": {
-                                            "properties": {
-                                                "title": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The title field is required."
-                                                    }
-                                                },
-                                                "questions": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The questions field is required."
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "IELTS Admin"
-                ],
-                "summary": "Hapus Essay",
-                "operationId": "deleteEssay",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID Essay",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Berhasil Hapus"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/login": {
             "post": {
                 "tags": [
@@ -826,6 +206,199 @@
                     }
                 }
             }
+        },
+        "/api/ielts/questions": {
+            "get": {
+                "tags": [
+                    "IELTS"
+                ],
+                "summary": "Ambil daftar semua essay dan soal",
+                "operationId": "getIeltsList",
+                "responses": {
+                    "200": {
+                        "description": "Berhasil"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/ielts/questions/{id}": {
+            "get": {
+                "tags": [
+                    "IELTS"
+                ],
+                "summary": "Ambil 1 soal spesifik beserta judul essay dan pilihannya",
+                "operationId": "getSingleQuestionDetailUnique",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/ielts/essays/{id}": {
+            "get": {
+                "tags": [
+                    "IELTS"
+                ],
+                "summary": "Ambil detail essay (Semua soal di dalamnya)",
+                "operationId": "getIeltsDetail",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/ielts/submit": {
+            "post": {
+                "tags": [
+                    "IELTS"
+                ],
+                "summary": "Submit Jawaban & Hitung Skor",
+                "operationId": "submitAnswers",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "essay_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "answers": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Skor Berhasil Disimpan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/ielts/essays": {
+            "post": {
+                "tags": [
+                    "IELTS Admin"
+                ],
+                "summary": "Tambah Soal Baru (Admin)",
+                "operationId": "createEssay",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/ielts/essays/{id}": {
+            "put": {
+                "tags": [
+                    "IELTS Admin"
+                ],
+                "summary": "Update Essay dan Soal (Admin)",
+                "operationId": "updateEssay",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "IELTS Admin"
+                ],
+                "summary": "Hapus Essay (Admin)",
+                "operationId": "deleteEssay",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -842,16 +415,16 @@
     },
     "tags": [
         {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
             "name": "IELTS",
             "description": "IELTS"
         },
         {
             "name": "IELTS Admin",
             "description": "IELTS Admin"
-        },
-        {
-            "name": "Auth",
-            "description": "Auth"
         }
     ]
 }

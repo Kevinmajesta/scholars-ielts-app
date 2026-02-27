@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeMail;
 use OpenApi\Attributes as OA;
 
 #[OA\Post(
@@ -87,6 +89,13 @@ class RegisteredUserController extends Controller
         ]);
 
         event(new Registered($user));
+
+        try {
+            Mail::to($user->email)->send(new WelcomeMail($user));
+        } catch (\Exception $e) {
+            // Log error jika email gagal, tapi register tetap lanjut
+            \Log::error("Gagal kirim email registrasi: " . $e->getMessage());
+        }
 
         return response()->json([
             'message' => 'User registered successfully!',
