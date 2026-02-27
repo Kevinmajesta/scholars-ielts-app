@@ -18,7 +18,8 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::prefix('ielts')->group(function () {
         Route::get('/questions', [IeltsController::class, 'index']);      
-        Route::get('/questions/{id}', [IeltsController::class, 'show']);  
+        Route::get('/essays/{id}', [IeltsController::class, 'show']);  
+        Route::get('/questions/{id}', [IeltsController::class, 'showquestion']);  
         Route::post('/submit', [IeltsController::class, 'submit']);       
     });
 

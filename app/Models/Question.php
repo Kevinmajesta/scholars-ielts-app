@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Question extends Model
 {
@@ -10,5 +12,9 @@ class Question extends Model
     public function options()
     {
         return $this->hasMany(Option::class);
+    }
+    public function essay(): BelongsTo
+    {
+        return $this->belongsTo(Essay::class);
     }
 }

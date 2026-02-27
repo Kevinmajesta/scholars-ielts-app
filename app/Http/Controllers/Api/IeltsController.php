@@ -30,6 +30,77 @@ class IeltsController extends Controller
 
     #[OA\Get(
         path: '/api/ielts/questions/{id}',
+        operationId: 'getSingleQuestionDetail',
+        tags: ['IELTS'],
+        summary: 'Ambil 1 soal spesifik beserta judul essay dan pilihannya',
+        description: 'Endpoint ini mengembalikan satu objek soal saja, lengkap dengan data essay (title, content) dan options soal tersebut.',
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                description: 'ID dari Soal (Question)',
+                schema: new OA\Schema(type: 'integer', example: 1)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Berhasil mengambil detail soal',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'success', type: 'boolean', example: true),
+                        new OA\Property(
+                            property: 'data',
+                            type: 'object',
+                            properties: [
+                                new OA\Property(property: 'id', type: 'integer', example: 1),
+                                new OA\Property(property: 'question_text', type: 'string', example: 'What is the main topic?'),
+                                new OA\Property(
+                                    property: 'essay',
+                                    type: 'object',
+                                    properties: [
+                                        new OA\Property(property: 'id', type: 'integer', example: 1),
+                                        new OA\Property(property: 'title', type: 'string', example: 'History of AI'),
+                                        new OA\Property(property: 'content', type: 'string', example: 'The history of AI starts...')
+                                    ]
+                                ),
+                                new OA\Property(
+                                    property: 'options',
+                                    type: 'array',
+                                    items: new OA\Items(
+                                        properties: [
+                                            new OA\Property(property: 'id', type: 'integer', example: 1),
+                                            new OA\Property(property: 'option_text', type: 'string', example: 'Technology'),
+                                            new OA\Property(property: 'is_correct', type: 'boolean', example: true)
+                                        ]
+                                    )
+                                )
+                            ]
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(response: 404, description: 'Soal tidak ditemukan'),
+            new OA\Response(response: 401, description: 'Unauthenticated (Token salah/kosong)')
+        ]
+    )]
+    public function showquestion($id)
+    {
+        $question = Question::with(['essay', 'options'])->find($id);
+
+        if (!$question) {
+            return response()->json(['message' => 'Soal tidak ditemukan'], 404);
+        }
+        return response()->json([
+            'success' => true,
+            'data' => $question
+        ]);
+    }
+
+    #[OA\Get(
+        path: '/api/ielts/essays/{id}',
         operationId: 'getIeltsDetail',
         tags: ['IELTS'],
         summary: 'Ambil detail soal berdasarkan ID',
@@ -60,7 +131,7 @@ class IeltsController extends Controller
             required: true,
             content: new OA\JsonContent(
                 properties: [
-                    
+
                     new OA\Property(property: 'essay_id', type: 'integer', example: 1),
                     new OA\Property(
                         property: 'answers',

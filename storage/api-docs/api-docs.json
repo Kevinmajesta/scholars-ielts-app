@@ -39,6 +39,107 @@
                 "tags": [
                     "IELTS"
                 ],
+                "summary": "Ambil 1 soal spesifik beserta judul essay dan pilihannya",
+                "description": "Endpoint ini mengembalikan satu objek soal saja, lengkap dengan data essay (title, content) dan options soal tersebut.",
+                "operationId": "getSingleQuestionDetail",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID dari Soal (Question)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil detail soal",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question_text": {
+                                                    "type": "string",
+                                                    "example": "What is the main topic?"
+                                                },
+                                                "essay": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "title": {
+                                                            "type": "string",
+                                                            "example": "History of AI"
+                                                        },
+                                                        "content": {
+                                                            "type": "string",
+                                                            "example": "The history of AI starts..."
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "options": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "option_text": {
+                                                                "type": "string",
+                                                                "example": "Technology"
+                                                            },
+                                                            "is_correct": {
+                                                                "type": "boolean",
+                                                                "example": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Soal tidak ditemukan"
+                    },
+                    "401": {
+                        "description": "Unauthenticated (Token salah/kosong)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/ielts/essays/{id}": {
+            "get": {
+                "tags": [
+                    "IELTS"
+                ],
                 "summary": "Ambil detail soal berdasarkan ID",
                 "operationId": "getIeltsDetail",
                 "parameters": [
