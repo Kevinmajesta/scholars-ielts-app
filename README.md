@@ -38,7 +38,7 @@ Dokumentasi: L5-Swagger (OpenAPI 3.0)
 
 Otentikasi: JWT Auth
 
-## Installation 👨🏻
+## Installation 
 
 1. Clone Repository
    By use terminal/cmd
