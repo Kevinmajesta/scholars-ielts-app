@@ -27,5 +27,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/essays', [IeltsController::class, 'store']);        
         Route::put('/essays/{id}', [IeltsController::class, 'update']);   
         Route::delete('/questions/{id}', [IeltsController::class, 'destroy']); 
+        Route::get('/results', [IeltsController::class, 'getHistory']);
+        Route::get('/results/{id}', [IeltsController::class, 'getHistoryByID']);
     });
 });

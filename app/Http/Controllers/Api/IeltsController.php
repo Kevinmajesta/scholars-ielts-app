@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Essay;
 use App\Models\Option;
 use App\Models\Question;
+use finfo;
 use Illuminate\Http\Request;
 use App\Models\ExamResult;
 use Illuminate\Support\Facades\Mail;
@@ -154,5 +155,19 @@ class IeltsController extends Controller
             return response()->json(['message' => 'Question not found'], 404);
         $question->delete();
         return response()->json(['success' => true, 'message' => 'Deleted successfully']);
+    }
+
+    public function getHistory()
+    {
+        $results = ExamResult::with('essay')->where('user_id', auth('api')->id())->get();
+        return response()->json(['success' => true, 'data' => $results]);
+    }
+
+    public function getHistoryByID($id)
+    {
+        $result = ExamResult::with('essay')->where('user_id', auth('api')->id())->find($id);
+        if (!$result)
+            return response()->json(['message' => 'Result / User not found'], 404);
+        return response()->json(['success' => true, 'data' => $result]);
     }
 }
