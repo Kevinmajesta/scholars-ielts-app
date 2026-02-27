@@ -14,11 +14,11 @@ Proyek ini adalah sistem backend berbasis Laravel untuk aplikasi latihan soal IE
 
 2. Sistem Penilaian Otomatis: Menghitung skor berdasarkan jawaban user secara real-time.
 
-3. Otentikasi JWT: Registrasi dan login aman menggunakan tymon/jwt-auth.
+3. Otentikasi JWT: Registrasi dan login aman menggunakan jwt-auth.
 
 4. RBAC (Role-Based Access Control): Perbedaan hak akses antara user dan admin.
 
-5. Dokumentasi Swagger: Dokumentasi API interaktif yang dapat dicoba langsung melalui browser.
+5. Dokumentasi Swagger: Dokumentasi API interaktif yang dapat dicoba langsung melalui browser juga Postman sebagai test API external.
 
 ---
 
@@ -59,7 +59,7 @@ composer install
 5. Setup environment
 
 ```sh
-docker-compose up -dcp .env.example .env
+.env.example .env
 php artisan key:generate
 php artisan jwt:secret
 ```
@@ -99,13 +99,16 @@ for the the api spec :)
 or http://localhost:8000/api/documentation for swagger UI
 ```
 
-## AI Quaetions
+## AI Question
 
 1. kira kira dari test diatas, table yg di pake apa aja yg hrus ku buat?
-2. UBAH CSRF DI LARAVEL KE JWT gmna chat?
-3. cara install swagger ui gmna
-4. tolong bikin anotsi buat swagger ui
-5. ini error apa
+2. Apakah CSRF ini bawaaan dari laravel breeze?
+3. UBAH CSRF DI LARAVEL KE JWT gmna chat?
+4. Konek jwt ke controller di laravel gmn chat
+5. cara install swagger ui gmna
+6. apakah swagger ui dgn postman untuk cek api sama? atau beda
+7. tolong bikin anotsi buat swagger ui
+8. ini error apa
 
 ```sh
 PS D:\Magang\scholars-ielts-app> php artisan l5-swagger:generate.
@@ -117,7 +120,8 @@ PS D:\Magang\scholars-ielts-app> php artisan l5-swagger:generate.
 
 PS D:\Magang\scholars-ielts-app> 
 ```
-6. Tolong Bikin readme project ini dari test yang kukirim diatas
+9. Tolong Bikin readme project ini dari test yang kukirim diatas
+10. cara masukin image di readme gmn chat
 
 
 ## Relasi Database
