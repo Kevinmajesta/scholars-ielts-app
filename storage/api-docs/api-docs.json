@@ -216,7 +216,7 @@
                 "operationId": "getIeltsList",
                 "responses": {
                     "200": {
-                        "description": "Berhasil"
+                        "description": "Berhasil ambil data"
                     }
                 },
                 "security": [
@@ -237,6 +237,7 @@
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "ID Question",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -266,6 +267,7 @@
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "ID Essay",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -304,6 +306,16 @@
                                     "answers": {
                                         "type": "array",
                                         "items": {
+                                            "properties": {
+                                                "question_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "option_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                }
+                                            },
                                             "type": "object"
                                         }
                                     }
@@ -330,7 +342,7 @@
                 "tags": [
                     "IELTS Admin"
                 ],
-                "summary": "Tambah Soal Baru (Admin)",
+                "summary": "Admin: Tambah Soal Baru",
                 "operationId": "createEssay",
                 "responses": {
                     "201": {
@@ -349,7 +361,7 @@
                 "tags": [
                     "IELTS Admin"
                 ],
-                "summary": "Update Essay dan Soal (Admin)",
+                "summary": "Admin: Update Essay dan Soal",
                 "operationId": "updateEssay",
                 "parameters": [
                     {
@@ -371,13 +383,15 @@
                         "bearerAuth": []
                     }
                 ]
-            },
+            }
+        },
+        "/api/admin/ielts/questions/{id}": {
             "delete": {
                 "tags": [
                     "IELTS Admin"
                 ],
-                "summary": "Hapus Essay (Admin)",
-                "operationId": "deleteEssay",
+                "summary": "Admin: Hapus Soal Spesifik",
+                "operationId": "deleteQuestion",
                 "parameters": [
                     {
                         "name": "id",
@@ -427,13 +441,13 @@
                 "tags": [
                     "IELTS Admin"
                 ],
-                "summary": "Admin: Ambil detail riwayat ujian spesifik berdasarkan ID Result",
+                "summary": "Admin: Ambil detail riwayat ujian spesifik",
                 "operationId": "adminGetResultDetail",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID dari Exam Result",
+                        "description": "ID Exam Result",
                         "required": true,
                         "schema": {
                             "type": "integer"
