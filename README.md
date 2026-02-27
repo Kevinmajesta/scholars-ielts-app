@@ -28,7 +28,7 @@ Proyek ini adalah sistem backend berbasis Laravel untuk aplikasi latihan soal IE
 
 Framework: Laravel 11
 
-Email Sender : SMTP Gmail
+Email Sender : SMTP Gmail ( Saat regis & sent notifscore akan nunggu loading sekitar 1-2 detik dikarenakan masih menggunakan send biasa belum menggunakan queue/background job)
 
 Bahasa: PHP 8.x
 
