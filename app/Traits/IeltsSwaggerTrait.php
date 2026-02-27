@@ -11,13 +11,50 @@ trait IeltsSwaggerTrait
         operationId: 'getIeltsList',
         tags: ['IELTS'],
         summary: 'Ambil daftar semua essay dan soal',
+        description: 'Jika login sebagai Admin, fitur Search dan Pagination akan aktif. Jika Student, akan mengembalikan semua data dengan opsi jawaban yang diacak.',
         security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'search',
+                in: 'query',
+                description: 'Cari berdasarkan judul essay (Hanya untuk Admin)',
+                required: false,
+                schema: new OA\Schema(type: 'string', example: 'Tea')
+            ),
+            new OA\Parameter(
+                name: 'limit',
+                in: 'query',
+                description: 'Jumlah data per halaman (Hanya untuk Admin)',
+                required: false,
+                schema: new OA\Schema(type: 'integer', default: 10, example: 5)
+            ),
+            new OA\Parameter(
+                name: 'page',
+                in: 'query',
+                description: 'Halaman ke-berapa (Hanya untuk Admin)',
+                required: false,
+                schema: new OA\Schema(type: 'integer', default: 1)
+            )
+        ],
         responses: [
-            new OA\Response(response: 200, description: 'Berhasil ambil data')
+            new OA\Response(
+                response: 200, 
+                description: 'Berhasil ambil data',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'status_code', type: 'integer', example: 200),
+                        new OA\Property(property: 'success', type: 'boolean', example: true),
+                        new OA\Property(property: 'message', type: 'string', example: 'Daftar essay berhasil diambil'),
+                        new OA\Property(property: 'data', type: 'object', description: 'Bisa berupa Array (User) atau Object Pagination (Admin)')
+                    ]
+                )
+            ),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 404, description: 'Tidak ada essay yang tersedia')
         ]
     )]
     public function indexDoc() {}
-
+    
     #[OA\Get(
         path: '/api/ielts/questions/{id}',
         operationId: 'getSingleQuestionDetailUnique',
