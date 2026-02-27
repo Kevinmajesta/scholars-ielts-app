@@ -399,6 +399,61 @@
                     }
                 ]
             }
+        },
+        "/api/admin/ielts/results": {
+            "get": {
+                "tags": [
+                    "IELTS Admin"
+                ],
+                "summary": "Admin: Ambil semua riwayat ujian seluruh user",
+                "operationId": "adminGetAllResults",
+                "responses": {
+                    "200": {
+                        "description": "Berhasil ambil semua data"
+                    },
+                    "403": {
+                        "description": "Forbidden (Bukan Admin)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/ielts/results/{id}": {
+            "get": {
+                "tags": [
+                    "IELTS Admin"
+                ],
+                "summary": "Admin: Ambil detail riwayat ujian spesifik berdasarkan ID Result",
+                "operationId": "adminGetResultDetail",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID dari Exam Result",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {

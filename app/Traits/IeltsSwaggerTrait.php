@@ -14,7 +14,9 @@ trait IeltsSwaggerTrait
         security: [['bearerAuth' => []]],
         responses: [new OA\Response(response: 200, description: 'Berhasil')]
     )]
-    public function indexDoc() {}
+    public function indexDoc()
+    {
+    }
 
     #[OA\Get(
         path: '/api/ielts/questions/{id}',
@@ -25,7 +27,9 @@ trait IeltsSwaggerTrait
         parameters: [new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
         responses: [new OA\Response(response: 200, description: 'Berhasil')]
     )]
-    public function showquestionDoc() {}
+    public function showquestionDoc()
+    {
+    }
 
     #[OA\Get(
         path: '/api/ielts/essays/{id}',
@@ -36,7 +40,9 @@ trait IeltsSwaggerTrait
         parameters: [new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
         responses: [new OA\Response(response: 200, description: 'Berhasil')]
     )]
-    public function showDoc() {}
+    public function showDoc()
+    {
+    }
 
     #[OA\Post(
         path: '/api/ielts/submit',
@@ -55,7 +61,9 @@ trait IeltsSwaggerTrait
         ),
         responses: [new OA\Response(response: 200, description: 'Skor Berhasil Disimpan')]
     )]
-    public function submitDoc() {}
+    public function submitDoc()
+    {
+    }
 
     #[OA\Post(
         path: '/api/admin/ielts/essays',
@@ -65,7 +73,9 @@ trait IeltsSwaggerTrait
         security: [['bearerAuth' => []]],
         responses: [new OA\Response(response: 201, description: 'Created')]
     )]
-    public function storeDoc() {}
+    public function storeDoc()
+    {
+    }
 
     #[OA\Put(
         path: '/api/admin/ielts/essays/{id}',
@@ -76,7 +86,9 @@ trait IeltsSwaggerTrait
         parameters: [new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
         responses: [new OA\Response(response: 200, description: 'Updated')]
     )]
-    public function updateDoc() {}
+    public function updateDoc()
+    {
+    }
 
     #[OA\Delete(
         path: '/api/admin/ielts/essays/{id}',
@@ -87,5 +99,40 @@ trait IeltsSwaggerTrait
         parameters: [new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
         responses: [new OA\Response(response: 200, description: 'Deleted')]
     )]
-    public function destroyDoc() {}
+    public function destroyDoc()
+    {
+    }
+
+    #[OA\Get(
+        path: '/api/admin/ielts/results',
+        operationId: 'adminGetAllResults',
+        tags: ['IELTS Admin'],
+        summary: 'Admin: Ambil semua riwayat ujian seluruh user',
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Berhasil ambil semua data'),
+            new OA\Response(response: 403, description: 'Forbidden (Bukan Admin)')
+        ]
+    )]
+    public function getHistoryDoc()
+    {
+    }
+
+    #[OA\Get(
+        path: '/api/admin/ielts/results/{id}',
+        operationId: 'adminGetResultDetail',
+        tags: ['IELTS Admin'],
+        summary: 'Admin: Ambil detail riwayat ujian spesifik berdasarkan ID Result',
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'id', in: 'path', required: true, description: 'ID dari Exam Result', schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Berhasil'),
+            new OA\Response(response: 404, description: 'Data tidak ditemukan')
+        ]
+    )]
+    public function getHistoryByIDDoc()
+    {
+    }
 }
